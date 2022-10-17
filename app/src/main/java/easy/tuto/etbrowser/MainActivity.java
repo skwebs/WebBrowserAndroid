@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Patterns;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -19,7 +18,6 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,60 +58,38 @@ public class MainActivity extends AppCompatActivity {
 
         loadMyUrl("google.com");
 
-        urlInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if(i == EditorInfo.IME_ACTION_GO || i == EditorInfo.IME_ACTION_DONE){
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(urlInput.getWindowToken(),0);
-                    loadMyUrl(urlInput.getText().toString());
-                    return true;
-                }
-                return false;
+        urlInput.setOnEditorActionListener((textView, i, keyEvent) -> {
+            if(i == EditorInfo.IME_ACTION_GO || i == EditorInfo.IME_ACTION_DONE){
+                InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(urlInput.getWindowToken(),0);
+                loadMyUrl(urlInput.getText().toString());
+                return true;
+            }
+            return false;
+        });
+
+        clearUrl.setOnClickListener(view -> urlInput.setText(""));
+
+        webBack.setOnClickListener(view -> {
+            if(webView.canGoBack()){
+                webView.goBack();
             }
         });
 
-        clearUrl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                urlInput.setText("");
+        webForward.setOnClickListener(view -> {
+            if(webView.canGoForward()){
+                webView.goForward();
             }
         });
 
-        webBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(webView.canGoBack()){
-                    webView.goBack();
-                }
-            }
-        });
+        webRefresh.setOnClickListener(view -> webView.reload());
 
-        webForward.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(webView.canGoForward()){
-                    webView.goForward();
-                }
-            }
-        });
-
-        webRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                webView.reload();
-            }
-        });
-
-        webShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setAction(Intent.ACTION_SEND);
-                intent.putExtra(Intent.EXTRA_TEXT, webView.getUrl());
-                intent.setType("text/plain");
-                startActivity(intent);
-            }
+        webShare.setOnClickListener(view -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setAction(Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_TEXT, webView.getUrl());
+            intent.setType("text/plain");
+            startActivity(intent);
         });
 
 
